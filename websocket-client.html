@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+</head>
+<body>
+  
+  <div id="login">
+    <label for="username">Nombre de usuario:</label>
+    <input type="text" id="username" placeholder="Ingresa tu nombre" />
+    <button id="join">Unirse</button>
+  </div>
+
+  <div id="chat" style="display:none;">
+    <textarea id="log" rows="10" cols="50" readonly></textarea><br>
+    <input type="text" id="message" placeholder="Escribe un mensaje" />
+    <button id="send">Enviar</button>
+  </div>
+
+  <script>
+    const usernameInput = document.getElementById("username");
+    const joinButton = document.getElementById("join");
+
+    const chatDiv = document.getElementById("chat");
+    const log = document.getElementById("log");
+    const messageInput = document.getElementById("message");
+    const sendButton = document.getElementById("send");
+
+    const socket = new WebSocket("ws://localhost:8080");
+    let isUsernameSent = false;
+
+    socket.onopen = () => {
+      log.value += "Conectado al servidor...\n";
+    };
+
+    socket.onmessage = (event) => {
+      const msg = event.data;
+
+      // Si el servidor está pidiendo el nombre y aún no lo hemos enviado
+      if (!isUsernameSent && msg.toLowerCase().includes("nombre")) {
+        loginDiv.style.display = "block";
+        chatDiv.style.display = "none";
+      } else {
+        // Mostrar el chat y los mensajes
+        loginDiv.style.display = "none";
+        chatDiv.style.display = "block";
+        log.value += `${msg}\n`;
+        log.scrollTop = log.scrollHeight;
+      }
+    };
+
+    joinButton.addEventListener("click", () => {
+      const name = usernameInput.value.trim();
+      if (name) {
+        socket.send(name);
+        isUsernameSent = true;
+        usernameInput.value = "";
+      }
+    });
+
+    sendButton.addEventListener("click", () => {
+      const message = messageInput.value.trim();
+      if (message) {
+        socket.send(message);
+        messageInput.value = "";
+      }
+    });
+
+    socket.onclose = () => {
+      log.value += "Conexión cerrada.\n";
+    };
+  </script>
+</body>
+</html>
