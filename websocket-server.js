@@ -15,9 +15,9 @@ console.log("Servidor WebSocket ejecutándose en ws://localhost:8080");
 
 // Manejar nuevas conexiones
 server.on("connection", (socket) => {
-  console.log("Cliente conectado.", 'background: #222; color: #bada55');
+  console.log("Cliente conectado.");
   socket.send(
-    "[Servidor] Bienvenido al chat. Por favor, ingresa tu nombre de usuario:" ,'background: #222; color: #bada55'
+    "[Servidor] Bienvenido al chat. Por favor, ingresa tu nombre de usuario:"
   );
 
   let clientName = null;
@@ -30,23 +30,21 @@ server.on("connection", (socket) => {
       // Primer mensaje: asumimos que es el nombre
       clientName = texto;
       console.log(`Nombre del cliente recibido: ${clientName}`);
-      socket.send(`[Servidor] El usuario "${clientName}" se ha unido al chat!`, 'background: #222; color: #bada55');
+      socket.send(`[Servidor] El usuario "${clientName}" se ha unido al chat!`);
     } else {
-      console.log(`[Servidor] Mensaje de ${clientName}: ${texto}`, 'background: #222; color: #bada55');
-      socket.send(`[Servidor] ${clientName}: "${texto}"`, 'background: #222; color: #bada55' );
+      console.log(`[Servidor] Mensaje de ${clientName}: ${texto}`);
+      socket.send(`[Servidor] ${clientName}: "${texto}"`);
     }
   });
 
   socket.on("close", () => {
-    console.log(`[Servidor] El usuario "${clientName}" ha salido del chat.` , 'background: #222; color: #bada55');
+    console.log(`[Servidor] El usuario "${clientName}" ha salido del chat.`);
   });
 
   // Interfaz de línea de comandos para el servidor
   rl.on("line", (input) => {
     if (input.trim() === "/salir") {
-      console.log(
-        chalk.yellow("Saliendo del chat...", "background: #222; color: #bada55")
-      );
+      console.log(chalk.yellow("Saliendo del chat..."));
       socket.close(); // Cierra la conexión WebSocket
       rl.close(); // Cierra la interfaz de línea de comandos
       process.exit(0); // Termina el proceso
